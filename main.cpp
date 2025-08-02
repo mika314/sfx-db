@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "imgui-impl-opengl3.h"
+#include "imgui-impl-opengl3-loader.h"
 #include "imgui-impl-sdl.h"
 #include "tinyfiledialogs.h"
 #include <imgui/imgui.h>
@@ -62,6 +63,10 @@ int main(int /*argc*/, char ** /*argv*/)
           running = false;
         }
       }
+
+      // Clear the screen
+      glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+      glClear(GL_COLOR_BUFFER_BIT);
 
       ImGui_ImplOpenGL3_NewFrame();
       ImGui_ImplSDL2_NewFrame();
