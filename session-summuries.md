@@ -34,3 +34,20 @@ This session focused on further refactoring the UI code into a dedicated class.
     *   Moved `ImGui` shutdown code from `Ui::shutdown()` into the `Ui` class destructor.
 *   **Main Function Simplification:** Updated `main.cpp` to instantiate and use the `Ui` class, removing direct `ImGui` calls and `init`/`shutdown` calls.
 *   **Verification:** Successfully built the project after each refactoring step using `coddle debug` to ensure correctness.
+
+---
+
+Sat Aug 02 12:50:12 PM PDT 2025
+
+This session focused on refactoring global audio variables into a dedicated class.
+
+**Summary of Actions:**
+
+*   **AudioPlayerManager Class Creation:** Created `AudioPlayerManager` class to encapsulate audio buffer queues and mutex.
+*   **Code Relocation:**
+    *   Moved global `audio_buffer_queue`, `audio_buffer_size_queue`, and `audio_mutex` into `AudioPlayerManager` as private members.
+    *   Moved `audio_callback` into `AudioPlayerManager` as a non-static member function.
+    *   Created `push_buffer` and `clear_buffers` public methods in `AudioPlayerManager` to manage audio data.
+*   **Main Function Update:** Updated `main.cpp` to instantiate `AudioPlayerManager` and pass its instance to the `sdl::Audio` constructor and `Ui` class. The lambda for the audio callback now captures the `AudioPlayerManager` instance and calls its non-static `audio_callback` method.
+*   **play_audio_sample Update:** Modified `play_audio_sample` to use the `AudioPlayerManager` instance for managing audio buffers.
+*   **Verification:** Successfully built the project using `coddle debug` to ensure correctness.

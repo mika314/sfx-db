@@ -34,6 +34,7 @@ int main(int /*argc*/, char ** /*argv*/)
     std::vector<Sample> samples_data;
     db.load_samples(samples_data);
 
+    AudioPlayerManager audio_player_manager;
     sdl::Init sdl(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
 
     SDL_AudioSpec wanted_spec, audio_spec;
@@ -42,8 +43,8 @@ int main(int /*argc*/, char ** /*argv*/)
     wanted_spec.format = AUDIO_S16SYS;
     wanted_spec.channels = 2;
     wanted_spec.samples = 4096;
-    auto audio_device = sdl::Audio{NULL, 0, &wanted_spec, &audio_spec, 0, [](Uint8 *stream, int len) {
-                                     return audio_callback(stream, len);
+        auto audio_device = sdl::Audio{NULL, 0, &wanted_spec, &audio_spec, 0, [&](Uint8 *stream, int len) {
+                                     audio_player_manager.audio_callback(stream, len);
                                    }};
     audio_device.pause(0); // Start audio playback
     sdl::Window window("sfx-db",
@@ -55,7 +56,7 @@ int main(int /*argc*/, char ** /*argv*/)
 
     auto gl_context = SDL_GL_CreateContext(window.get());
 
-    Ui ui(window, gl_context, db, samples_data);
+    Ui ui(window, gl_context, db, samples_data, audio_player_manager);
 
     while (ui.isRunning())
     {

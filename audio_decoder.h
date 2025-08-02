@@ -1,3 +1,5 @@
+#include "audio_player.h"
+
 extern "C" {
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
@@ -7,4 +9,4 @@ extern "C" {
 
 struct Sample;
 
-void play_audio_sample(const Sample &sample);
+void play_audio_sample(const Sample &sample, AudioPlayerManager& audio_player_manager);

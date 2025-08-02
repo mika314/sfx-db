@@ -4,16 +4,10 @@
 #include <SDL.h>
 #include <log/log.hpp>
 
-void play_audio_sample(const Sample &sample)
+void play_audio_sample(const Sample &sample, AudioPlayerManager& audio_player_manager)
 {
   // Clear any existing audio in the queue
-  std::lock_guard<std::mutex> lock(audio_mutex);
-  while (!audio_buffer_queue.empty())
-  {
-    av_freep(&audio_buffer_queue.front());
-    audio_buffer_queue.pop();
-    audio_buffer_size_queue.pop();
-  }
+  audio_player_manager.clear_buffers();
 
   AVFormatContext *pFormatCtx = NULL;
   AVCodecContext *pCodecCtx = NULL;
@@ -191,8 +185,7 @@ void play_audio_sample(const Sample &sample)
                             av_samples_get_buffer_size(NULL, 2, out_samples, AV_SAMPLE_FMT_S16, 1);
                           uint8_t *new_buffer = (uint8_t *)av_malloc(out_buffer_size);
                           SDL_memcpy(new_buffer, out_buffer, out_buffer_size);
-                          audio_buffer_queue.push(new_buffer);
-                          audio_buffer_size_queue.push(out_buffer_size);
+                          audio_player_manager.push_buffer(new_buffer, out_buffer_size);
                           av_freep(&out_buffer);
                         }
                       }

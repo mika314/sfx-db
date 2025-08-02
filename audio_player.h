@@ -1,5 +1,6 @@
 #pragma once
 
+#include <SDL.h>
 #include <cstdint>
 #include <mutex>
 #include <queue>
@@ -8,8 +9,18 @@ extern "C" {
 #include <libavutil/avutil.h>
 }
 
-extern std::queue<uint8_t *> audio_buffer_queue;
-extern std::queue<int> audio_buffer_size_queue;
-extern std::mutex audio_mutex;
+class AudioPlayerManager
+{
+public:
+    AudioPlayerManager();
+    ~AudioPlayerManager();
 
-void audio_callback(uint8_t *stream, int len);
+    void push_buffer(uint8_t *buffer, int size);
+    void clear_buffers();
+    void audio_callback(Uint8 *stream, int len);
+
+private:
+    std::queue<uint8_t *> m_audio_buffer_queue;
+    std::queue<int> m_audio_buffer_size_queue;
+    std::mutex m_audio_mutex;
+};
