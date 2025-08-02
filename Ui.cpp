@@ -11,13 +11,14 @@
 
 #include "miniaudio.h"
 
-Ui::Ui(sdl::Window &window, SDL_GLContext gl_context, Database &db, std::vector<Sample> &samples_data)
+Ui::Ui(sdl::Window &window, SDL_GLContext gl_context, Database &db, std::vector<Sample> &samples_data, const std::string& initial_filter)
   : m_window(window),
     m_gl_context(gl_context),
     m_db(db),
     m_samples_data(samples_data),
     m_running(true),
-    m_selected_sample_idx(-1)
+    m_selected_sample_idx(-1),
+    filter(initial_filter)
 {
   IMGUI_CHECKVERSION();
   ImGui::CreateContext();
@@ -27,6 +28,7 @@ Ui::Ui(sdl::Window &window, SDL_GLContext gl_context, Database &db, std::vector<
   ImGui::StyleColorsDark();
   ImGui_ImplSDL2_InitForOpenGL(m_window.get(), m_gl_context);
   ImGui_ImplOpenGL3_Init("#version 130");
+  m_db.load_samples(m_samples_data, filter);
 }
 
 Ui::~Ui()

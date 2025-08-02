@@ -4,6 +4,7 @@
 #include "sample.h"
 #include <fstream>
 #include <iostream>
+#include <limits>
 #include <log/log.hpp>
 #include <sdlpp/sdlpp.hpp>
 #include <string>
@@ -18,6 +19,7 @@ int main(int /*argc*/, char ** /*argv*/)
     int initial_window_y = SDL_WINDOWPOS_UNDEFINED;
     int initial_window_w = 640;
     int initial_window_h = 480;
+    std::string initial_filter;
 
     std::ifstream ifs("window_state.txt");
     if (ifs.is_open())
@@ -26,6 +28,9 @@ int main(int /*argc*/, char ** /*argv*/)
       ifs >> initial_window_y;
       ifs >> initial_window_w;
       ifs >> initial_window_h;
+      // Consume the rest of the line after reading the numbers
+      ifs.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+      std::getline(ifs, initial_filter);
       ifs.close();
     }
 
@@ -44,7 +49,7 @@ int main(int /*argc*/, char ** /*argv*/)
 
     auto gl_context = SDL_GL_CreateContext(window.get());
 
-    Ui ui(window, gl_context, db, samples_data);
+    Ui ui(window, gl_context, db, samples_data, initial_filter);
 
     while (ui.isRunning())
     {
@@ -69,6 +74,7 @@ int main(int /*argc*/, char ** /*argv*/)
       ofs << final_window_y << std::endl;
       ofs << final_window_w << std::endl;
       ofs << final_window_h << std::endl;
+      ofs << ui.getFilter() << std::endl;
       ofs.close();
     }
   }

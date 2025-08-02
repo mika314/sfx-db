@@ -10,12 +10,13 @@
 class Ui
 {
 public:
-  Ui(sdl::Window &window, SDL_GLContext gl_context, Database &db, std::vector<Sample> &samples_data);
+  Ui(sdl::Window &window, SDL_GLContext gl_context, Database &db, std::vector<Sample> &samples_data, const std::string& initial_filter);
   ~Ui();
 
   bool processEvent(SDL_Event &event);
   void render();
   bool isRunning() const { return m_running; }
+  std::string getFilter() const { return filter; }
 
 private:
   void extract_metadata_and_insert(const char *filepath);

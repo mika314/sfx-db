@@ -132,3 +132,20 @@ This session focused on implementing keyboard navigation and auto-scrolling for 
     *   In the rendering loop, if `m_scroll_to_selected` is `true`, `ImGui::SetScrollHereY()` is called to scroll to the selected item, and the flag is reset.
 *   **Verification:**
     *   Successfully built the project using `coddle debug` to ensure the changes were correct.
+---
+
+Sat Aug 2 04:34:48 PM PDT 2025
+
+This session focused on making the filter value persistent across sessions and ensuring it's applied on startup.
+
+**Summary of Actions:**
+
+*   **Filter Persistence:**
+    *   Modified `Ui.h` to include a `getFilter()` method to retrieve the current filter value.
+    *   Modified `Ui.h` and `Ui.cpp` to update the `Ui` constructor to accept an `initial_filter` string.
+    *   Modified `main.cpp` to load and save the filter value to `window_state.txt` along with window position and size.
+    *   Corrected a syntax error in `main.cpp` related to reading the filter string.
+*   **Apply Filter on Startup:**
+    *   Modified the `Ui` constructor in `Ui.cpp` to call `m_db.load_samples` with the `initial_filter` to ensure the filter is applied when the application starts.
+*   **Verification:**
+    *   Successfully built the project using `coddle debug` to ensure the changes were correct.
