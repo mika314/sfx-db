@@ -109,14 +109,14 @@ void Ui::render()
   ImGui::Text("Sound Samples");
   if (ImGui::BeginTable("samples", 8, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg))
   {
-    ImGui::TableSetupColumn("Filepath");
-    ImGui::TableSetupColumn("Filename");
-    ImGui::TableSetupColumn("Size");
-    ImGui::TableSetupColumn("Duration");
-    ImGui::TableSetupColumn("Sample Rate");
-    ImGui::TableSetupColumn("Bit Depth");
-    ImGui::TableSetupColumn("Channels");
-    ImGui::TableSetupColumn("Tags");
+    ImGui::TableSetupColumn("Filepath", ImGuiTableColumnFlags_WidthStretch, 2.0f);
+    ImGui::TableSetupColumn("Filename", ImGuiTableColumnFlags_WidthStretch, 1.0f);
+    ImGui::TableSetupColumn("Size", ImGuiTableColumnFlags_WidthFixed, 80.0f);
+    ImGui::TableSetupColumn("Duration", ImGuiTableColumnFlags_WidthFixed, 80.0f);
+    ImGui::TableSetupColumn("Sample Rate", ImGuiTableColumnFlags_WidthFixed, 100.0f);
+    ImGui::TableSetupColumn("Bit Depth", ImGuiTableColumnFlags_WidthFixed, 80.0f);
+    ImGui::TableSetupColumn("Channels", ImGuiTableColumnFlags_WidthFixed, 80.0f);
+    ImGui::TableSetupColumn("Tags", ImGuiTableColumnFlags_WidthFixed, 100.0f);
     ImGui::TableHeadersRow();
 
     for (size_t i = 0; i < m_samples_data.size(); ++i)

@@ -93,3 +93,25 @@ This session focused on fixing an ImGui ID conflict.
 
 *   **Fix ImGui ID Conflict:** Added `ImGui::PushID(i)` and `ImGui::PopID()` around the `ImGui::Selectable` call within the table loop in `Ui.cpp` to ensure unique IDs for each selectable row.
 *   **Verification:** Successfully built the project using `coddle debug` to ensure the fix was correct.
+
+---
+
+Sat Aug 02 02:28:00 PM PDT 2025
+
+This session focused on implementing automatic audio playback upon sample selection.
+
+**Summary of Actions:**
+
+*   **Auto-play on Selection:** Modified `Ui.cpp` to call `m_audio_player_manager.play_audio_sample` immediately when a sample is selected in the ImGui table.
+*   **Verification:** Successfully built the project using `coddle debug` to ensure the change was correct.
+
+---
+
+Sat Aug 02 02:31:01 PM PDT 2025
+
+This session focused on optimizing the horizontal space usage in the sound samples table.
+
+**Summary of Actions:**
+
+*   **Column Width Adjustment:** Modified `Ui.cpp` to use `ImGuiTableColumnFlags_WidthStretch` for "Filepath" and "Filename" columns (with weights 2.0f and 1.0f respectively) and `ImGuiTableColumnFlags_WidthFixed` for "Size", "Duration", "Sample Rate", "Bit Depth", "Channels", and "Tags" columns with estimated fixed widths.
+*   **Verification:** Successfully built the project using `coddle debug` to ensure the changes were correct.
