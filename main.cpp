@@ -62,6 +62,7 @@ int main(int /*argc*/, char ** /*argv*/)
     ImGui::CreateContext();
     ImGuiIO &io = ImGui::GetIO();
     (void)io;
+    io.ConfigFlags &= ~ImGuiConfigFlags_ViewportsEnable; // Disable multi-viewports
     ImGui::StyleColorsDark();
     ImGui_ImplSDL2_InitForOpenGL(window.get(), gl_context);
     ImGui_ImplOpenGL3_Init("#version 130");
@@ -87,6 +88,21 @@ int main(int /*argc*/, char ** /*argv*/)
       ImGui_ImplOpenGL3_NewFrame();
       ImGui_ImplSDL2_NewFrame();
       ImGui::NewFrame();
+
+      // Create a full-window ImGui window to contain all content
+      ImGuiViewport* viewport = ImGui::GetMainViewport();
+      ImGui::SetNextWindowPos(viewport->WorkPos);
+      ImGui::SetNextWindowSize(viewport->WorkSize);
+      ImGui::SetNextWindowViewport(viewport->ID);
+
+      ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoTitleBar |
+                                 ImGuiWindowFlags_NoResize |
+                                 ImGuiWindowFlags_NoMove |
+                                 ImGuiWindowFlags_NoCollapse |
+                                 ImGuiWindowFlags_NoBringToFrontOnFocus |
+                                 ImGuiWindowFlags_NoNavFocus;
+
+      ImGui::Begin("MainUI", nullptr, window_flags);
 
       if (ImGui::BeginMainMenuBar())
       {
@@ -189,8 +205,8 @@ int main(int /*argc*/, char ** /*argv*/)
         ImGui::EndMainMenuBar();
       }
 
-      ImGui::Begin("Sound Samples");
-
+      // Your table or main content
+      ImGui::Text("Sound Samples");
       if (ImGui::BeginTable("samples", 8, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg))
       {
         ImGui::TableSetupColumn("Filepath");
