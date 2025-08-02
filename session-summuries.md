@@ -64,3 +64,21 @@ This session focused on moving the `play_audio_sample` function into the `AudioP
 *   **Update `Ui.cpp`:** Modified `Ui.cpp` to call the `play_audio_sample` method through the `m_audio_player_manager` instance.
 *   **Remove `play_audio_sample` declaration:** Removed the `play_audio_sample` declaration from `audio_decoder.h`.
 *   **Verification:** Built the project to ensure correctness.
+
+---
+
+### Git Commit Message Technique
+
+For complex or detailed commits, the commit message can be written in a separate file. The `git commit -F <file>` command is then used to pass the file's content as the commit message. This allows for easier editing and review of long commit messages.
+
+---
+
+Sat Aug 02 01:25:00 PM PDT 2025
+
+This session focused on refactoring the metadata extraction logic in the UI.
+
+**Summary of Actions:**
+
+*   **Refactor Metadata Extraction:** Moved the logic for extracting audio file metadata and inserting it into the database from the main `Ui::render` loop into a new private helper function, `Ui::extract_metadata_and_insert`.
+*   **Code Organization:** This change improves code organization and readability by separating the file dialog interaction from the metadata processing logic.
+*   **Verification:** Successfully built the project using `coddle debug` to ensure the refactoring was correct.

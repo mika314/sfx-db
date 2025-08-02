@@ -18,6 +18,7 @@ public:
   bool isRunning() const { return m_running; }
 
 private:
+  void extract_metadata_and_insert(const char *filepath);
   sdl::Window &m_window;
   SDL_GLContext m_gl_context;
   Database &m_db;

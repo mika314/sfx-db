@@ -89,75 +89,7 @@ void Ui::render()
         if (lTheOpenFileName)
         {
           LOG("Selected file: ", lTheOpenFileName);
-
-          Sample new_sample;
-          new_sample.filepath = lTheOpenFileName;
-          std::filesystem::path p(new_sample.filepath);
-          new_sample.filename = p.filename().string();
-
-          try
-          {
-            new_sample.size = std::filesystem::file_size(p);
-          }
-          catch (const std::filesystem::filesystem_error &e)
-          {
-            LOG("Error getting file size: ", e.what());
-            new_sample.size = 0;
-          }
-
-          AVFormatContext *pFormatCtx = NULL;
-          double duration = 0.0;
-          int sample_rate = 0;
-          int channels = 0;
-          int bit_depth = 0;
-          int audio_stream_idx = -1;
-
-          if (avformat_open_input(&pFormatCtx, lTheOpenFileName, NULL, NULL) != 0)
-          {
-            LOG("Couldn\'t open input stream.");
-          }
-          else
-          {
-            if (avformat_find_stream_info(pFormatCtx, NULL) < 0)
-            {
-              LOG("Couldn\'t find stream information.");
-            }
-            else
-            {
-              duration = (double)pFormatCtx->duration / AV_TIME_BASE;
-              LOG("Duration: ", duration);
-              for (unsigned int i = 0; i < pFormatCtx->nb_streams; i++)
-              {
-                if (pFormatCtx->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_AUDIO)
-                {
-                  audio_stream_idx = i;
-                  sample_rate = pFormatCtx->streams[i]->codecpar->sample_rate;
-                  channels = pFormatCtx->streams[i]->codecpar->channels;
-                  bit_depth = av_get_bits_per_sample(pFormatCtx->streams[i]->codecpar->codec_id);
-                  LOG("Sample Rate: ", sample_rate);
-                  LOG("Channels: ", channels);
-                  LOG("Bit Depth: ", bit_depth);
-                  break;
-                }
-              }
-            }
-            avformat_close_input(&pFormatCtx);
-          }
-
-          if (audio_stream_idx != -1)
-          { // Only insert if audio stream found
-            new_sample.duration = duration;
-            new_sample.sample_rate = sample_rate;
-            new_sample.bit_depth = bit_depth;
-            new_sample.channels = channels;
-            new_sample.tags = ""; // Empty tags for now
-            m_db.insert_sample(new_sample);
-            m_db.load_samples(m_samples_data); // Refresh data after insertion
-          }
-          else
-          {
-            LOG("No audio stream found in selected file. Not inserting into database.");
-          }
+          extract_metadata_and_insert(lTheOpenFileName);
         }
       }
       if (ImGui::MenuItem("Scan Directory"))
@@ -236,4 +168,76 @@ void Ui::render()
   ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
   m_window.glSwap();
+}
+
+void Ui::extract_metadata_and_insert(const char *filepath)
+{
+  Sample new_sample;
+  new_sample.filepath = filepath;
+  std::filesystem::path p(new_sample.filepath);
+  new_sample.filename = p.filename().string();
+
+  try
+  {
+    new_sample.size = std::filesystem::file_size(p);
+  }
+  catch (const std::filesystem::filesystem_error &e)
+  {
+    LOG("Error getting file size: ", e.what());
+    new_sample.size = 0;
+  }
+
+  AVFormatContext *pFormatCtx = NULL;
+  double duration = 0.0;
+  int sample_rate = 0;
+  int channels = 0;
+  int bit_depth = 0;
+  int audio_stream_idx = -1;
+
+  if (avformat_open_input(&pFormatCtx, filepath, NULL, NULL) != 0)
+  {
+    LOG("Couldn\'t open input stream.");
+  }
+  else
+  {
+    if (avformat_find_stream_info(pFormatCtx, NULL) < 0)
+    {
+      LOG("Couldn\'t find stream information.");
+    }
+    else
+    {
+      duration = (double)pFormatCtx->duration / AV_TIME_BASE;
+      LOG("Duration: ", duration);
+      for (unsigned int i = 0; i < pFormatCtx->nb_streams; i++)
+      {
+        if (pFormatCtx->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_AUDIO)
+        {
+          audio_stream_idx = i;
+          sample_rate = pFormatCtx->streams[i]->codecpar->sample_rate;
+          channels = pFormatCtx->streams[i]->codecpar->channels;
+          bit_depth = av_get_bits_per_sample(pFormatCtx->streams[i]->codecpar->codec_id);
+          LOG("Sample Rate: ", sample_rate);
+          LOG("Channels: ", channels);
+          LOG("Bit Depth: ", bit_depth);
+          break;
+        }
+      }
+    }
+    avformat_close_input(&pFormatCtx);
+  }
+
+  if (audio_stream_idx != -1)
+  {
+    new_sample.duration = duration;
+    new_sample.sample_rate = sample_rate;
+    new_sample.bit_depth = bit_depth;
+    new_sample.channels = channels;
+    new_sample.tags = "";
+    m_db.insert_sample(new_sample);
+    m_db.load_samples(m_samples_data);
+  }
+  else
+  {
+    LOG("No audio stream found in selected file. Not inserting into database.");
+  }
 }
