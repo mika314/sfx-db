@@ -109,6 +109,44 @@ void Ui::render()
     ImGui::SetKeyboardFocusHere();
     m_db.load_samples(m_samples_data, filter);
   }
+
+  if (ImGui::IsKeyPressed(ImGuiKey_UpArrow))
+  {
+    if (m_selected_sample_idx > 0)
+    {
+      m_selected_sample_idx--;
+      m_scroll_to_selected = true;
+      m_audio_player.play_audio_sample(m_samples_data[m_selected_sample_idx]);
+    }
+  }
+  if (ImGui::IsKeyPressed(ImGuiKey_DownArrow))
+  {
+    if (m_selected_sample_idx < (int)m_samples_data.size() - 1)
+    {
+      m_selected_sample_idx++;
+      m_scroll_to_selected = true;
+      m_audio_player.play_audio_sample(m_samples_data[m_selected_sample_idx]);
+    }
+  }
+  if (ImGui::IsKeyPressed(ImGuiKey_PageUp))
+  {
+    if (m_selected_sample_idx > 0)
+    {
+      m_selected_sample_idx = std::max(0, m_selected_sample_idx - 10);
+      m_scroll_to_selected = true;
+      m_audio_player.play_audio_sample(m_samples_data[m_selected_sample_idx]);
+    }
+  }
+  if (ImGui::IsKeyPressed(ImGuiKey_PageDown))
+  {
+    if (m_selected_sample_idx < (int)m_samples_data.size() - 1)
+    {
+      m_selected_sample_idx = std::min((int)m_samples_data.size() - 1, m_selected_sample_idx + 10);
+      m_scroll_to_selected = true;
+      m_audio_player.play_audio_sample(m_samples_data[m_selected_sample_idx]);
+    }
+  }
+
   if (ImGui::BeginTable("samples", 8, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg))
   {
     ImGui::TableSetupColumn("Filepath", ImGuiTableColumnFlags_WidthStretch, 2.0f);
@@ -131,7 +169,13 @@ void Ui::render()
                             ImGuiSelectableFlags_SpanAllColumns))
       {
         m_selected_sample_idx = i;
+        m_scroll_to_selected = true;
         m_audio_player.play_audio_sample(m_samples_data[m_selected_sample_idx]);
+      }
+      if (m_scroll_to_selected && m_selected_sample_idx == (int)i)
+      {
+        ImGui::SetScrollHereY();
+        m_scroll_to_selected = false;
       }
       ImGui::TableSetColumnIndex(1);
       ImGui::Text("%s", m_samples_data[i].filename.c_str());

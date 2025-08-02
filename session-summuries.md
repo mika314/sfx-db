@@ -115,3 +115,20 @@ This session focused on optimizing the horizontal space usage in the sound sampl
 
 *   **Column Width Adjustment:** Modified `Ui.cpp` to use `ImGuiTableColumnFlags_WidthStretch` for "Filepath" and "Filename" columns (with weights 2.0f and 1.0f respectively) and `ImGuiTableColumnFlags_WidthFixed` for "Size", "Duration", "Sample Rate", "Bit Depth", "Channels", and "Tags" columns with estimated fixed widths.
 *   **Verification:** Successfully built the project using `coddle debug` to ensure the changes were correct.
+---
+
+Sat Aug 2 04:28:36 PM PDT 2025
+
+This session focused on implementing keyboard navigation and auto-scrolling for the sample list.
+
+**Summary of Actions:**
+
+*   **Keyboard Navigation:**
+    *   Added logic to `Ui.cpp` to handle up, down, page up, and page down key presses to navigate the sample list.
+    *   The `m_selected_sample_idx` is updated accordingly.
+*   **Auto-scrolling:**
+    *   Added a boolean flag `m_scroll_to_selected` to `Ui.h`.
+    *   Modified `Ui.cpp` to set this flag to `true` when the selected sample changes.
+    *   In the rendering loop, if `m_scroll_to_selected` is `true`, `ImGui::SetScrollHereY()` is called to scroll to the selected item, and the flag is reset.
+*   **Verification:**
+    *   Successfully built the project using `coddle debug` to ensure the changes were correct.

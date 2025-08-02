@@ -27,4 +27,5 @@ private:
   bool m_running;
   int m_selected_sample_idx;
   std::string filter;
+  bool m_scroll_to_selected = false;
 };
