@@ -8,12 +8,7 @@
 #include <fstream>
 #include <log/log.hpp>
 
-extern "C" {
-#include <libavcodec/avcodec.h>
-#include <libavformat/avformat.h>
-#include <libavutil/avutil.h>
-#include <libswresample/swresample.h>
-}
+#include "miniaudio.h"
 
 Ui::Ui(sdl::Window &window,
        SDL_GLContext gl_context,
@@ -187,57 +182,30 @@ void Ui::extract_metadata_and_insert(const char *filepath)
     new_sample.size = 0;
   }
 
-  AVFormatContext *pFormatCtx = NULL;
-  double duration = 0.0;
-  int sample_rate = 0;
-  int channels = 0;
-  int bit_depth = 0;
-  int audio_stream_idx = -1;
-
-  if (avformat_open_input(&pFormatCtx, filepath, NULL, NULL) != 0)
+  ma_decoder decoder;
+  ma_result result = ma_decoder_init_file(filepath, NULL, &decoder);
+  if (result != MA_SUCCESS)
   {
-    LOG("Couldn\'t open input stream.");
-  }
-  else
-  {
-    if (avformat_find_stream_info(pFormatCtx, NULL) < 0)
-    {
-      LOG("Couldn\'t find stream information.");
-    }
-    else
-    {
-      duration = (double)pFormatCtx->duration / AV_TIME_BASE;
-      LOG("Duration: ", duration);
-      for (unsigned int i = 0; i < pFormatCtx->nb_streams; i++)
-      {
-        if (pFormatCtx->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_AUDIO)
-        {
-          audio_stream_idx = i;
-          sample_rate = pFormatCtx->streams[i]->codecpar->sample_rate;
-          channels = pFormatCtx->streams[i]->codecpar->channels;
-          bit_depth = av_get_bits_per_sample(pFormatCtx->streams[i]->codecpar->codec_id);
-          LOG("Sample Rate: ", sample_rate);
-          LOG("Channels: ", channels);
-          LOG("Bit Depth: ", bit_depth);
-          break;
-        }
-      }
-    }
-    avformat_close_input(&pFormatCtx);
+    LOG("Failed to open audio file: ", filepath);
+    return;
   }
 
-  if (audio_stream_idx != -1)
+  ma_uint64 frame_count;
+  if (ma_decoder_get_length_in_pcm_frames(&decoder, &frame_count) != MA_SUCCESS)
   {
-    new_sample.duration = duration;
-    new_sample.sample_rate = sample_rate;
-    new_sample.bit_depth = bit_depth;
-    new_sample.channels = channels;
-    new_sample.tags = "";
-    m_db.insert_sample(new_sample);
-    m_db.load_samples(m_samples_data);
+    LOG("Failed to get duration for: ", filepath);
+    ma_decoder_uninit(&decoder);
+    return;
   }
-  else
-  {
-    LOG("No audio stream found in selected file. Not inserting into database.");
-  }
+
+  new_sample.duration = (double)frame_count / decoder.outputSampleRate;
+  new_sample.sample_rate = decoder.outputSampleRate;
+  new_sample.channels = decoder.outputChannels;
+  new_sample.bit_depth = ma_get_bytes_per_sample(decoder.outputFormat) * 8;
+  new_sample.tags = ""; // Empty tags for now
+
+  m_db.insert_sample(new_sample);
+  m_db.load_samples(m_samples_data); // Refresh data after insertion
+
+  ma_decoder_uninit(&decoder);
 }

@@ -5,10 +5,6 @@
 #include <mutex>
 #include <queue>
 
-extern "C" {
-#include <libavutil/avutil.h>
-}
-
 struct Sample;
 
 class AudioPlayerManager
@@ -26,4 +22,5 @@ private:
   std::queue<uint8_t *> m_audio_buffer_queue;
   std::queue<int> m_audio_buffer_size_queue;
   std::mutex m_audio_mutex;
+  int current_buffer_read_offset = 0;
 };
