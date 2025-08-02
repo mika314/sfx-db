@@ -1,3 +1,4 @@
+#include <fstream>
 #include <filesystem>
 #include <iostream>
 #include <string>
@@ -21,6 +22,21 @@ int main(int /*argc*/, char ** /*argv*/)
 {
   try
   {
+    // Load window position and size from file
+    int initial_window_x = SDL_WINDOWPOS_UNDEFINED;
+    int initial_window_y = SDL_WINDOWPOS_UNDEFINED;
+    int initial_window_w = 640;
+    int initial_window_h = 480;
+
+    std::ifstream ifs("window_state.txt");
+    if (ifs.is_open()) {
+        ifs >> initial_window_x;
+        ifs >> initial_window_y;
+        ifs >> initial_window_w;
+        ifs >> initial_window_h;
+        ifs.close();
+    }
+
     Database db("sfx.db");
     std::vector<Sample> samples_data;
     db.load_samples(samples_data);
@@ -38,7 +54,7 @@ int main(int /*argc*/, char ** /*argv*/)
                                    }};
     audio_device.pause(0); // Start audio playback
     sdl::Window window(
-      "sfx-db", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 640, 480, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
+      "sfx-db", initial_window_x, initial_window_y, initial_window_w, initial_window_h, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
 
     auto gl_context = SDL_GL_CreateContext(window.get());
 
@@ -231,6 +247,20 @@ int main(int /*argc*/, char ** /*argv*/)
       ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
       window.glSwap();
+    }
+
+    // Save window position and size to file
+    int final_window_x, final_window_y, final_window_w, final_window_h;
+    SDL_GetWindowPosition(window.get(), &final_window_x, &final_window_y);
+    SDL_GetWindowSize(window.get(), &final_window_w, &final_window_h);
+
+    std::ofstream ofs("window_state.txt");
+    if (ofs.is_open()) {
+        ofs << final_window_x << std::endl;
+        ofs << final_window_y << std::endl;
+        ofs << final_window_w << std::endl;
+        ofs << final_window_h << std::endl;
+        ofs.close();
     }
   }
   catch (const std::exception &e)
