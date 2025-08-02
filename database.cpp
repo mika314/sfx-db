@@ -51,7 +51,7 @@ void Database::load_samples(std::vector<Sample> &samples_data, std::string where
   samples_data.clear();
   const std::string select_sql =
     "SELECT filepath, filename, size, duration, samplerate, bitdepth, channels, tags FROM samples" +
-    (!where.empty() ? (" WHERE " + where) : std::string{}) + ";";
+    (!where.empty() ? (" WHERE " + where) : std::string{}) + " ORDER BY filepath;";
   sqlite3_stmt *stmt;
   int rc_select = sqlite3_prepare_v2(db_, select_sql.c_str(), -1, &stmt, 0);
   if (rc_select != SQLITE_OK)
