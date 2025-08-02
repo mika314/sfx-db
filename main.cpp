@@ -1,5 +1,4 @@
 #include "Ui.h"
-#include "audio_decoder.h"
 #include "audio_player.h"
 #include "database.h"
 #include "sample.h"
@@ -43,7 +42,7 @@ int main(int /*argc*/, char ** /*argv*/)
     wanted_spec.format = AUDIO_S16SYS;
     wanted_spec.channels = 2;
     wanted_spec.samples = 4096;
-        auto audio_device = sdl::Audio{NULL, 0, &wanted_spec, &audio_spec, 0, [&](Uint8 *stream, int len) {
+    auto audio_device = sdl::Audio{NULL, 0, &wanted_spec, &audio_spec, 0, [&](Uint8 *stream, int len) {
                                      audio_player_manager.audio_callback(stream, len);
                                    }};
     audio_device.pause(0); // Start audio playback

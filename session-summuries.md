@@ -51,3 +51,16 @@ This session focused on refactoring global audio variables into a dedicated clas
 *   **Main Function Update:** Updated `main.cpp` to instantiate `AudioPlayerManager` and pass its instance to the `sdl::Audio` constructor and `Ui` class. The lambda for the audio callback now captures the `AudioPlayerManager` instance and calls its non-static `audio_callback` method.
 *   **play_audio_sample Update:** Modified `play_audio_sample` to use the `AudioPlayerManager` instance for managing audio buffers.
 *   **Verification:** Successfully built the project using `coddle debug` to ensure correctness.
+
+---
+
+Sat Aug 02 01:16:23 PM PDT 2025
+
+This session focused on moving the `play_audio_sample` function into the `AudioPlayerManager` class.
+
+**Summary of Actions:**
+
+*   **Move `play_audio_sample`:** Moved the `play_audio_sample` function from `audio_decoder.cpp` to `audio_player.cpp` and made it a member function of `AudioPlayerManager`.
+*   **Update `Ui.cpp`:** Modified `Ui.cpp` to call the `play_audio_sample` method through the `m_audio_player_manager` instance.
+*   **Remove `play_audio_sample` declaration:** Removed the `play_audio_sample` declaration from `audio_decoder.h`.
+*   **Verification:** Built the project to ensure correctness.

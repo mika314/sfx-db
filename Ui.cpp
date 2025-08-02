@@ -1,5 +1,4 @@
 #include "Ui.h"
-#include "audio_decoder.h"
 #include "audio_player.h"
 #include "imgui-impl-opengl3-loader.h"
 #include "imgui-impl-opengl3.h"
@@ -9,23 +8,34 @@
 #include <fstream>
 #include <log/log.hpp>
 
-Ui::Ui(sdl::Window& window, SDL_GLContext gl_context, Database& db, std::vector<Sample>& samples_data, AudioPlayerManager& audio_player_manager)
-    : m_window(window),
-      m_gl_context(gl_context),
-      m_db(db),
-      m_samples_data(samples_data),
-      m_audio_player_manager(audio_player_manager),
-      m_running(true),
-      m_selected_sample_idx(-1)
+extern "C" {
+#include <libavcodec/avcodec.h>
+#include <libavformat/avformat.h>
+#include <libavutil/avutil.h>
+#include <libswresample/swresample.h>
+}
+
+Ui::Ui(sdl::Window &window,
+       SDL_GLContext gl_context,
+       Database &db,
+       std::vector<Sample> &samples_data,
+       AudioPlayerManager &audio_player_manager)
+  : m_window(window),
+    m_gl_context(gl_context),
+    m_db(db),
+    m_samples_data(samples_data),
+    m_audio_player_manager(audio_player_manager),
+    m_running(true),
+    m_selected_sample_idx(-1)
 {
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    ImGuiIO &io = ImGui::GetIO();
-    (void)io;
-    io.ConfigFlags &= ~ImGuiConfigFlags_ViewportsEnable; // Disable multi-viewports
-    ImGui::StyleColorsDark();
-    ImGui_ImplSDL2_InitForOpenGL(m_window.get(), m_gl_context);
-    ImGui_ImplOpenGL3_Init("#version 130");
+  IMGUI_CHECKVERSION();
+  ImGui::CreateContext();
+  ImGuiIO &io = ImGui::GetIO();
+  (void)io;
+  io.ConfigFlags &= ~ImGuiConfigFlags_ViewportsEnable; // Disable multi-viewports
+  ImGui::StyleColorsDark();
+  ImGui_ImplSDL2_InitForOpenGL(m_window.get(), m_gl_context);
+  ImGui_ImplOpenGL3_Init("#version 130");
 }
 
 Ui::~Ui()
@@ -215,9 +225,9 @@ void Ui::render()
     ImGui::Separator();
     ImGui::Text("Selected Sample: %s", m_samples_data[m_selected_sample_idx].filename.c_str());
     if (ImGui::Button("Play"))
-        {
-            play_audio_sample(m_samples_data[m_selected_sample_idx], m_audio_player_manager);
-        }
+    {
+      m_audio_player_manager.play_audio_sample(m_samples_data[m_selected_sample_idx]);
+    }
   }
 
   ImGui::End();
