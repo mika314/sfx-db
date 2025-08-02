@@ -6,9 +6,17 @@
 
 #include "miniaudio.h"
 
-AudioPlayerManager::AudioPlayerManager() {}
+AudioPlayer::AudioPlayer()
+  : wanted_spec{.freq = 44100, .format = AUDIO_S16SYS, .channels = 2, .samples = 4096},
+    audio_device(sdl::Audio{NULL, 0, &wanted_spec, &audio_spec, 0, [&](Uint8 *stream, int len) {
+                              audio_callback(stream, len);
+                            }})
 
-AudioPlayerManager::~AudioPlayerManager()
+{
+  audio_device.pause(0); // Start audio playback
+}
+
+AudioPlayer::~AudioPlayer()
 {
   // Clear any remaining buffers in the queue
   std::lock_guard<std::mutex> lock(m_audio_mutex);
@@ -21,14 +29,14 @@ AudioPlayerManager::~AudioPlayerManager()
   }
 }
 
-void AudioPlayerManager::push_buffer(uint8_t *buffer, int size)
+void AudioPlayer::push_buffer(uint8_t *buffer, int size)
 {
   std::lock_guard<std::mutex> lock(m_audio_mutex);
   m_audio_buffer_queue.push(buffer);
   m_audio_buffer_size_queue.push(size);
 }
 
-void AudioPlayerManager::clear_buffers()
+void AudioPlayer::clear_buffers()
 {
   std::lock_guard<std::mutex> lock(m_audio_mutex);
   while (!m_audio_buffer_queue.empty())
@@ -41,7 +49,7 @@ void AudioPlayerManager::clear_buffers()
   current_buffer_read_offset = 0;
 }
 
-void AudioPlayerManager::audio_callback(uint8_t *stream, int len)
+void AudioPlayer::audio_callback(uint8_t *stream, int len)
 {
   std::lock_guard<std::mutex> lock(m_audio_mutex);
   int stream_fill_pos = 0;
@@ -83,7 +91,7 @@ void AudioPlayerManager::audio_callback(uint8_t *stream, int len)
   }
 }
 
-void AudioPlayerManager::play_audio_sample(const Sample &sample)
+void AudioPlayer::play_audio_sample(const Sample &sample)
 {
   // Clear any existing audio in the queue
   clear_buffers();
@@ -124,4 +132,48 @@ void AudioPlayerManager::play_audio_sample(const Sample &sample)
               framesRead * ma_get_bytes_per_frame(decoder.outputFormat, decoder.outputChannels));
 
   ma_decoder_uninit(&decoder);
+}
+
+Sample AudioPlayer::extract_meta_data(const char *filepath)
+{
+  Sample new_sample;
+  new_sample.filepath = filepath;
+  std::filesystem::path p(new_sample.filepath);
+  new_sample.filename = p.filename().string();
+
+  try
+  {
+    new_sample.size = std::filesystem::file_size(p);
+  }
+  catch (const std::filesystem::filesystem_error &e)
+  {
+    LOG("Error getting file size: ", e.what());
+    new_sample.size = 0;
+    return {};
+  }
+
+  ma_decoder decoder;
+  ma_result result = ma_decoder_init_file(filepath, NULL, &decoder);
+  if (result != MA_SUCCESS)
+  {
+    LOG("Failed to open audio file: ", filepath);
+    return {};
+  }
+
+  ma_uint64 frame_count;
+  if (ma_decoder_get_length_in_pcm_frames(&decoder, &frame_count) != MA_SUCCESS)
+  {
+    LOG("Failed to get duration for: ", filepath);
+    ma_decoder_uninit(&decoder);
+    return {};
+  }
+
+  new_sample.duration = (double)frame_count / decoder.outputSampleRate;
+  new_sample.sample_rate = decoder.outputSampleRate;
+  new_sample.channels = decoder.outputChannels;
+  new_sample.bit_depth = ma_get_bytes_per_sample(decoder.outputFormat) * 8;
+  new_sample.tags = ""; // Empty tags for now
+
+  ma_decoder_uninit(&decoder);
+  return new_sample;
 }

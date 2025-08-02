@@ -6,20 +6,16 @@
 #include "tinyfiledialogs.h"
 #include <filesystem>
 #include <fstream>
+#include <imgui/misc/cpp/imgui_stdlib.h>
 #include <log/log.hpp>
 
 #include "miniaudio.h"
 
-Ui::Ui(sdl::Window &window,
-       SDL_GLContext gl_context,
-       Database &db,
-       std::vector<Sample> &samples_data,
-       AudioPlayerManager &audio_player_manager)
+Ui::Ui(sdl::Window &window, SDL_GLContext gl_context, Database &db, std::vector<Sample> &samples_data)
   : m_window(window),
     m_gl_context(gl_context),
     m_db(db),
     m_samples_data(samples_data),
-    m_audio_player_manager(audio_player_manager),
     m_running(true),
     m_selected_sample_idx(-1)
 {
@@ -94,6 +90,7 @@ void Ui::render()
         {
           LOG("Selected directory: ", lTheSelectedDirectory);
           m_db.scan_directory(lTheSelectedDirectory);
+          m_db.load_samples(m_samples_data, filter);
         }
       }
       if (ImGui::MenuItem("Exit"))
@@ -107,6 +104,11 @@ void Ui::render()
 
   // Your table or main content
   ImGui::Text("Sound Samples");
+  if (ImGui::InputText("Filter", &filter, ImGuiInputTextFlags_EnterReturnsTrue))
+  {
+    ImGui::SetKeyboardFocusHere();
+    m_db.load_samples(m_samples_data, filter);
+  }
   if (ImGui::BeginTable("samples", 8, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg))
   {
     ImGui::TableSetupColumn("Filepath", ImGuiTableColumnFlags_WidthStretch, 2.0f);
@@ -129,7 +131,7 @@ void Ui::render()
                             ImGuiSelectableFlags_SpanAllColumns))
       {
         m_selected_sample_idx = i;
-        m_audio_player_manager.play_audio_sample(m_samples_data[m_selected_sample_idx]);
+        m_audio_player.play_audio_sample(m_samples_data[m_selected_sample_idx]);
       }
       ImGui::TableSetColumnIndex(1);
       ImGui::Text("%s", m_samples_data[i].filename.c_str());
@@ -150,16 +152,6 @@ void Ui::render()
     ImGui::EndTable();
   }
 
-  if (m_selected_sample_idx != -1)
-  {
-    ImGui::Separator();
-    ImGui::Text("Selected Sample: %s", m_samples_data[m_selected_sample_idx].filename.c_str());
-    if (ImGui::Button("Play"))
-    {
-      m_audio_player_manager.play_audio_sample(m_samples_data[m_selected_sample_idx]);
-    }
-  }
-
   ImGui::End();
 
   ImGui::Render();
@@ -170,45 +162,9 @@ void Ui::render()
 
 void Ui::extract_metadata_and_insert(const char *filepath)
 {
-  Sample new_sample;
-  new_sample.filepath = filepath;
-  std::filesystem::path p(new_sample.filepath);
-  new_sample.filename = p.filename().string();
-
-  try
-  {
-    new_sample.size = std::filesystem::file_size(p);
-  }
-  catch (const std::filesystem::filesystem_error &e)
-  {
-    LOG("Error getting file size: ", e.what());
-    new_sample.size = 0;
-  }
-
-  ma_decoder decoder;
-  ma_result result = ma_decoder_init_file(filepath, NULL, &decoder);
-  if (result != MA_SUCCESS)
-  {
-    LOG("Failed to open audio file: ", filepath);
+  auto new_sample = AudioPlayer::extract_meta_data(filepath);
+  if (new_sample.filepath.empty())
     return;
-  }
-
-  ma_uint64 frame_count;
-  if (ma_decoder_get_length_in_pcm_frames(&decoder, &frame_count) != MA_SUCCESS)
-  {
-    LOG("Failed to get duration for: ", filepath);
-    ma_decoder_uninit(&decoder);
-    return;
-  }
-
-  new_sample.duration = (double)frame_count / decoder.outputSampleRate;
-  new_sample.sample_rate = decoder.outputSampleRate;
-  new_sample.channels = decoder.outputChannels;
-  new_sample.bit_depth = ma_get_bytes_per_sample(decoder.outputFormat) * 8;
-  new_sample.tags = ""; // Empty tags for now
-
   m_db.insert_sample(new_sample);
-  m_db.load_samples(m_samples_data); // Refresh data after insertion
-
-  ma_decoder_uninit(&decoder);
+  m_db.load_samples(m_samples_data, filter);
 }
