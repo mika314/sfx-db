@@ -37,7 +37,7 @@ int main(int /*argc*/, char ** /*argv*/)
                                    }};
     audio_device.pause(0); // Start audio playback
     sdl::Window window(
-      "sfx-db", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 640, 480, SDL_WINDOW_OPENGL);
+      "sfx-db", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 640, 480, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
 
     auto gl_context = SDL_GL_CreateContext(window.get());
 
