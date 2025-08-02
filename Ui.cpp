@@ -112,6 +112,12 @@ void Ui::render()
     m_db.load_samples(m_samples_data, filter);
   }
 
+  // Calculate remaining height for the child window
+  float footer_height_to_reserve = ImGui::GetStyle().ItemSpacing.y; // Adjust as needed for other elements below
+  ImVec2 child_size = ImVec2(0, -footer_height_to_reserve);
+
+  ImGui::BeginChild("SampleListChild", child_size, ImGuiChildFlags_None, ImGuiWindowFlags_AlwaysVerticalScrollbar);
+
   if (ImGui::IsKeyPressed(ImGuiKey_UpArrow))
   {
     if (m_selected_sample_idx > 0)
@@ -208,6 +214,7 @@ void Ui::render()
     clipper.End();
     ImGui::EndTable();
   }
+  ImGui::EndChild(); // End of the child window for the sample list
 
   ImGui::End();
 
