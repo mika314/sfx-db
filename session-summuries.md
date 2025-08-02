@@ -82,3 +82,14 @@ This session focused on refactoring the metadata extraction logic in the UI.
 *   **Refactor Metadata Extraction:** Moved the logic for extracting audio file metadata and inserting it into the database from the main `Ui::render` loop into a new private helper function, `Ui::extract_metadata_and_insert`.
 *   **Code Organization:** This change improves code organization and readability by separating the file dialog interaction from the metadata processing logic.
 *   **Verification:** Successfully built the project using `coddle debug` to ensure the refactoring was correct.
+
+---
+
+Sat Aug 02 02:24:24 PM PDT 2025
+
+This session focused on fixing an ImGui ID conflict.
+
+**Summary of Actions:**
+
+*   **Fix ImGui ID Conflict:** Added `ImGui::PushID(i)` and `ImGui::PopID()` around the `ImGui::Selectable` call within the table loop in `Ui.cpp` to ensure unique IDs for each selectable row.
+*   **Verification:** Successfully built the project using `coddle debug` to ensure the fix was correct.

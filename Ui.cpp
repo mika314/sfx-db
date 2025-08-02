@@ -121,6 +121,7 @@ void Ui::render()
 
     for (size_t i = 0; i < m_samples_data.size(); ++i)
     {
+      ImGui::PushID(i); // Push unique ID for each row
       ImGui::TableNextRow();
       ImGui::TableSetColumnIndex(0);
       if (ImGui::Selectable(m_samples_data[i].filepath.c_str(),
@@ -143,6 +144,7 @@ void Ui::render()
       ImGui::Text("%d channels", m_samples_data[i].channels);
       ImGui::TableSetColumnIndex(7);
       ImGui::Text("%s", m_samples_data[i].tags.c_str());
+      ImGui::PopID(); // Pop the ID
     }
     ImGui::EndTable();
   }
