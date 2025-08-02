@@ -129,6 +129,7 @@ void Ui::render()
                             ImGuiSelectableFlags_SpanAllColumns))
       {
         m_selected_sample_idx = i;
+        m_audio_player_manager.play_audio_sample(m_samples_data[m_selected_sample_idx]);
       }
       ImGui::TableSetColumnIndex(1);
       ImGui::Text("%s", m_samples_data[i].filename.c_str());
