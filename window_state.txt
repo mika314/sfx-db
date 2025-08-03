@@ -1,6 +1,0 @@
-0
-29
-1920
-1019
-13
-filename like "%die%" and duration < 3
