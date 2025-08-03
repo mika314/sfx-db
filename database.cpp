@@ -2,6 +2,31 @@
 #include "audio_player.h"
 #include <filesystem>
 #include <log/log.hpp>
+#include <regex.h>
+
+static void regexp(sqlite3_context *context, int /*argc*/, sqlite3_value **argv) {
+    const char *pattern = (const char *)sqlite3_value_text(argv[0]);
+    const char *text = (const char *)sqlite3_value_text(argv[1]);
+
+    regex_t regex;
+    int ret;
+
+    if (pattern == NULL || text == NULL) {
+        sqlite3_result_int(context, 0);
+        return;
+    }
+
+    ret = regcomp(&regex, pattern, REG_EXTENDED | REG_ICASE | REG_NOSUB);
+    if (ret != 0) {
+        sqlite3_result_error(context, "Invalid regular expression", -1);
+        return;
+    }
+
+    ret = regexec(&regex, text, 0, NULL, 0);
+    regfree(&regex);
+
+    sqlite3_result_int(context, (ret == 0));
+}
 
 Database::Database(const std::string &db_path)
 {
@@ -15,6 +40,9 @@ Database::Database(const std::string &db_path)
   {
     LOG("Opened database successfully");
   }
+
+  // Register "REGEXP" function
+  sqlite3_create_function(db_, "REGEXP", 2, SQLITE_UTF8, NULL, &regexp, NULL, NULL);
 
   char *zErrMsg = 0;
   const char *sql = "CREATE TABLE IF NOT EXISTS samples ("
