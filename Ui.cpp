@@ -15,13 +15,14 @@ Ui::Ui(sdl::Window &window,
        SDL_GLContext gl_context,
        Database &db,
        std::vector<Sample> &samples_data,
-       const std::string &initial_filter)
+       const std::string &initial_filter,
+       int initial_selected_sample_idx)
   : m_window(window),
     m_gl_context(gl_context),
     m_db(db),
     m_samples_data(samples_data),
     m_running(true),
-    m_selected_sample_idx(-1),
+    m_selected_sample_idx(initial_selected_sample_idx),
     filter(initial_filter)
 {
   IMGUI_CHECKVERSION();
@@ -35,6 +36,18 @@ Ui::Ui(sdl::Window &window,
   ImGui_ImplSDL2_InitForOpenGL(m_window.get(), m_gl_context);
   ImGui_ImplOpenGL3_Init("#version 130");
   m_db.load_samples(m_samples_data, filter);
+  if (m_selected_sample_idx >= 0 && static_cast<size_t>(m_selected_sample_idx) < m_samples_data.size())
+  {
+    m_scroll_to_selected = true;
+  }
+  if (m_selected_sample_idx >= 0 && static_cast<size_t>(m_selected_sample_idx) < m_samples_data.size())
+  {
+    m_scroll_to_selected = true;
+  }
+  if (m_selected_sample_idx >= 0 && static_cast<size_t>(m_selected_sample_idx) < m_samples_data.size())
+  {
+    m_scroll_to_selected = true;
+  }
 }
 
 Ui::~Ui()

@@ -14,13 +14,15 @@ public:
      SDL_GLContext gl_context,
      Database &db,
      std::vector<Sample> &samples_data,
-     const std::string &initial_filter);
+     const std::string &initial_filter,
+     int initial_selected_sample_idx);
   ~Ui();
 
   bool processEvent(SDL_Event &event);
   void render();
   bool isRunning() const { return m_running; }
   std::string getFilter() const { return filter; }
+  int getSelectedSampleIdx() const { return m_selected_sample_idx; }
 
 private:
   void extract_metadata_and_insert(const char *filepath);

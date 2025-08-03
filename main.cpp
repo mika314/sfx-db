@@ -20,6 +20,7 @@ int main(int /*argc*/, char ** /*argv*/)
     int initial_window_w = 640;
     int initial_window_h = 480;
     std::string initial_filter;
+    int initial_selected_sample_idx = -1;
 
     std::ifstream ifs("window_state.txt");
     if (ifs.is_open())
@@ -28,6 +29,7 @@ int main(int /*argc*/, char ** /*argv*/)
       ifs >> initial_window_y;
       ifs >> initial_window_w;
       ifs >> initial_window_h;
+      ifs >> initial_selected_sample_idx;
       // Consume the rest of the line after reading the numbers
       ifs.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
       std::getline(ifs, initial_filter);
@@ -49,7 +51,7 @@ int main(int /*argc*/, char ** /*argv*/)
 
     auto gl_context = SDL_GL_CreateContext(window.get());
 
-    Ui ui(window, gl_context, db, samples_data, initial_filter);
+        Ui ui(window, gl_context, db, samples_data, initial_filter, initial_selected_sample_idx);
 
     while (ui.isRunning())
     {
@@ -74,6 +76,7 @@ int main(int /*argc*/, char ** /*argv*/)
       ofs << final_window_y << std::endl;
       ofs << final_window_w << std::endl;
       ofs << final_window_h << std::endl;
+      ofs << ui.getSelectedSampleIdx() << std::endl;
       ofs << ui.getFilter() << std::endl;
       ofs.close();
     }

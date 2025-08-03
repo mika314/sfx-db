@@ -175,3 +175,17 @@ This session focused on optimizing the sample list rendering for large libraries
     *   This ensures that only visible items in the sample list are rendered, significantly improving performance.
 *   **Verification:**
     *   Successfully built the project using `coddle debug` to ensure the changes were correct.
+---
+
+Sat Aug 2 04:50:00 PM PDT 2025
+
+This session focused on making the selected sample persistent across application restarts.
+
+**Summary of Actions:**
+
+*   **Selected Sample Persistence:**
+    *   Modified `main.cpp` to load and save the `m_selected_sample_idx` from/to `window_state.txt`.
+    *   Modified `Ui.h` to add a `getSelectedSampleIdx()` method.
+    *   Modified `Ui.cpp` to initialize `m_selected_sample_idx` from the loaded value and to set `m_scroll_to_selected` to `true` if a valid index is loaded.
+*   **Verification:**
+    *   Successfully built the project using `coddle debug` to ensure the changes were correct.
