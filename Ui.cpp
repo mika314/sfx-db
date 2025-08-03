@@ -145,8 +145,7 @@ void Ui::render()
     {
       m_selected_sample_idx--;
       m_scroll_to_selected = true;
-      m_audio_player.play_audio_sample(m_samples_data[m_selected_sample_idx]);
-      ImGui::SetClipboardText(m_samples_data[m_selected_sample_idx].filepath.c_str());
+      playAndClipboardSample();
     }
   }
   if (ImGui::IsKeyPressed(ImGuiKey_DownArrow))
@@ -155,8 +154,7 @@ void Ui::render()
     {
       m_selected_sample_idx++;
       m_scroll_to_selected = true;
-      m_audio_player.play_audio_sample(m_samples_data[m_selected_sample_idx]);
-      ImGui::SetClipboardText(m_samples_data[m_selected_sample_idx].filepath.c_str());
+      playAndClipboardSample();
     }
   }
   if (ImGui::IsKeyPressed(ImGuiKey_PageUp))
@@ -165,8 +163,7 @@ void Ui::render()
     {
       m_selected_sample_idx = std::max(0, m_selected_sample_idx - 10);
       m_scroll_to_selected = true;
-      m_audio_player.play_audio_sample(m_samples_data[m_selected_sample_idx]);
-      ImGui::SetClipboardText(m_samples_data[m_selected_sample_idx].filepath.c_str());
+      playAndClipboardSample();
     }
   }
   if (ImGui::IsKeyPressed(ImGuiKey_PageDown))
@@ -175,8 +172,7 @@ void Ui::render()
     {
       m_selected_sample_idx = std::min((int)m_samples_data.size() - 1, m_selected_sample_idx + 10);
       m_scroll_to_selected = true;
-      m_audio_player.play_audio_sample(m_samples_data[m_selected_sample_idx]);
-      ImGui::SetClipboardText(m_samples_data[m_selected_sample_idx].filepath.c_str());
+      playAndClipboardSample();
     }
   }
 
@@ -207,8 +203,7 @@ void Ui::render()
         {
           m_selected_sample_idx = row_num;
           m_scroll_to_selected = true;
-          m_audio_player.play_audio_sample(m_samples_data[m_selected_sample_idx]);
-          ImGui::SetClipboardText(m_samples_data[m_selected_sample_idx].filepath.c_str());
+          playAndClipboardSample();
         }
         if (m_scroll_to_selected && m_selected_sample_idx == row_num)
         {
@@ -252,4 +247,12 @@ void Ui::extract_metadata_and_insert(const char *filepath)
     return;
   m_db.insert_sample(new_sample);
   m_db.load_samples(m_samples_data, filter);
+}
+
+auto Ui::playAndClipboardSample() -> void
+{
+  if (m_selected_sample_idx < 0 || m_selected_sample_idx >= static_cast<int>(m_samples_data.size()))
+    return;
+  m_audio_player.play_audio_sample(m_samples_data[m_selected_sample_idx]);
+  ImGui::SetClipboardText(m_samples_data[m_selected_sample_idx].filepath.c_str());
 }
