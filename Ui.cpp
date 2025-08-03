@@ -176,10 +176,9 @@ void Ui::render()
     }
   }
 
-  if (ImGui::BeginTable("samples", 8, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg))
+  if (ImGui::BeginTable("samples", 7, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg))
   {
     ImGui::TableSetupColumn("Filepath", ImGuiTableColumnFlags_WidthStretch, 2.0f);
-    ImGui::TableSetupColumn("Filename", ImGuiTableColumnFlags_WidthStretch, 1.0f);
     ImGui::TableSetupColumn("Size", ImGuiTableColumnFlags_WidthFixed, 80.0f);
     ImGui::TableSetupColumn("Duration", ImGuiTableColumnFlags_WidthFixed, 80.0f);
     ImGui::TableSetupColumn("Sample Rate", ImGuiTableColumnFlags_WidthFixed, 100.0f);
@@ -211,18 +210,16 @@ void Ui::render()
           m_scroll_to_selected = false;
         }
         ImGui::TableSetColumnIndex(1);
-        ImGui::Text("%s", m_samples_data[row_num].filename.c_str());
-        ImGui::TableSetColumnIndex(2);
         ImGui::Text("%lld KB", m_samples_data[row_num].size / 1024);
-        ImGui::TableSetColumnIndex(3);
+        ImGui::TableSetColumnIndex(2);
         ImGui::Text("%.2f s", m_samples_data[row_num].duration);
-        ImGui::TableSetColumnIndex(4);
+        ImGui::TableSetColumnIndex(3);
         ImGui::Text("%d Hz", m_samples_data[row_num].sample_rate);
-        ImGui::TableSetColumnIndex(5);
+        ImGui::TableSetColumnIndex(4);
         ImGui::Text("%d bit", m_samples_data[row_num].bit_depth);
-        ImGui::TableSetColumnIndex(6);
+        ImGui::TableSetColumnIndex(5);
         ImGui::Text("%d channels", m_samples_data[row_num].channels);
-        ImGui::TableSetColumnIndex(7);
+        ImGui::TableSetColumnIndex(6);
         ImGui::Text("%s", m_samples_data[row_num].tags.c_str());
         ImGui::PopID(); // Pop the ID
       }

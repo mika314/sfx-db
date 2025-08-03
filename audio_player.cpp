@@ -139,7 +139,7 @@ Sample AudioPlayer::extract_meta_data(const char *filepath)
   Sample new_sample;
   new_sample.filepath = filepath;
   std::filesystem::path p(new_sample.filepath);
-  new_sample.filename = p.filename().string();
+  
 
   try
   {

@@ -48,7 +48,6 @@ Database::Database(const std::string &db_path)
   const char *sql = "CREATE TABLE IF NOT EXISTS samples ("
                     "ID INTEGER PRIMARY KEY AUTOINCREMENT,"
                     "filepath TEXT NOT NULL,"
-                    "filename TEXT NOT NULL,"
                     "size INT NOT NULL,"
                     "duration REAL NOT NULL,"
                     "samplerate INT NOT NULL,"
@@ -78,7 +77,7 @@ void Database::load_samples(std::vector<Sample> &samples_data, std::string where
 {
   samples_data.clear();
   const std::string select_sql =
-    "SELECT filepath, filename, size, duration, samplerate, bitdepth, channels, tags FROM samples" +
+    "SELECT filepath, size, duration, samplerate, bitdepth, channels, tags FROM samples" +
     (!where.empty() ? (" WHERE " + where) : std::string{}) + " ORDER BY filepath;";
   sqlite3_stmt *stmt;
   int rc_select = sqlite3_prepare_v2(db_, select_sql.c_str(), -1, &stmt, 0);
@@ -92,13 +91,12 @@ void Database::load_samples(std::vector<Sample> &samples_data, std::string where
     {
       Sample s;
       s.filepath = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 0));
-      s.filename = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 1));
-      s.size = sqlite3_column_int64(stmt, 2);
-      s.duration = sqlite3_column_double(stmt, 3);
-      s.sample_rate = sqlite3_column_int(stmt, 4);
-      s.bit_depth = sqlite3_column_int(stmt, 5);
-      s.channels = sqlite3_column_int(stmt, 6);
-      s.tags = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 7));
+      s.size = sqlite3_column_int64(stmt, 1);
+      s.duration = sqlite3_column_double(stmt, 2);
+      s.sample_rate = sqlite3_column_int(stmt, 3);
+      s.bit_depth = sqlite3_column_int(stmt, 4);
+      s.channels = sqlite3_column_int(stmt, 5);
+      s.tags = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 6));
       samples_data.push_back(s);
     }
     if (rc_select != SQLITE_DONE)
@@ -111,8 +109,8 @@ void Database::load_samples(std::vector<Sample> &samples_data, std::string where
 
 void Database::insert_sample(const Sample &sample)
 {
-  std::string insert_sql = "INSERT INTO samples (filepath, filename, size, duration, samplerate, "
-                           "bitdepth, channels, tags) VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
+  std::string insert_sql = "INSERT INTO samples (filepath, size, duration, samplerate, "
+                           "bitdepth, channels, tags) VALUES (?, ?, ?, ?, ?, ?, ?);";
   sqlite3_stmt *stmt;
   int rc = sqlite3_prepare_v2(db_, insert_sql.c_str(), -1, &stmt, 0);
   if (rc != SQLITE_OK)
@@ -122,13 +120,12 @@ void Database::insert_sample(const Sample &sample)
   else
   {
     sqlite3_bind_text(stmt, 1, sample.filepath.c_str(), -1, SQLITE_STATIC);
-    sqlite3_bind_text(stmt, 2, sample.filename.c_str(), -1, SQLITE_STATIC);
-    sqlite3_bind_int64(stmt, 3, sample.size);
-    sqlite3_bind_double(stmt, 4, sample.duration);
-    sqlite3_bind_int(stmt, 5, sample.sample_rate);
-    sqlite3_bind_int(stmt, 6, sample.bit_depth);
-    sqlite3_bind_int(stmt, 7, sample.channels);
-    sqlite3_bind_text(stmt, 8, sample.tags.c_str(), -1, SQLITE_STATIC);
+    sqlite3_bind_int64(stmt, 2, sample.size);
+    sqlite3_bind_double(stmt, 3, sample.duration);
+    sqlite3_bind_int(stmt, 4, sample.sample_rate);
+    sqlite3_bind_int(stmt, 5, sample.bit_depth);
+    sqlite3_bind_int(stmt, 6, sample.channels);
+    sqlite3_bind_text(stmt, 7, sample.tags.c_str(), -1, SQLITE_STATIC);
 
     rc = sqlite3_step(stmt);
     if (rc != SQLITE_DONE)
