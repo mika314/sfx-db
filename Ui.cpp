@@ -127,9 +127,9 @@ void Ui::render()
   ImGui::Text("Sound Samples");
   if (ImGui::InputText("Filter", &filter, ImGuiInputTextFlags_EnterReturnsTrue))
   {
-    ImGui::SetKeyboardFocusHere();
     m_db.load_samples(m_samples_data, filter);
   }
+  ImGui::SetKeyboardFocusHere(-1); // Keep focus on the input text after pressing Enter
 
   // Calculate remaining height for the child window
   float footer_height_to_reserve =
