@@ -11,7 +11,11 @@
 
 #include "miniaudio.h"
 
-Ui::Ui(sdl::Window &window, SDL_GLContext gl_context, Database &db, std::vector<Sample> &samples_data, const std::string& initial_filter)
+Ui::Ui(sdl::Window &window,
+       SDL_GLContext gl_context,
+       Database &db,
+       std::vector<Sample> &samples_data,
+       const std::string &initial_filter)
   : m_window(window),
     m_gl_context(gl_context),
     m_db(db),
@@ -25,6 +29,8 @@ Ui::Ui(sdl::Window &window, SDL_GLContext gl_context, Database &db, std::vector<
   ImGuiIO &io = ImGui::GetIO();
   (void)io;
   io.ConfigFlags &= ~ImGuiConfigFlags_ViewportsEnable; // Disable multi-viewports
+  io.KeyRepeatDelay = 0.15f;                           // Shorter delay before key repeat starts
+  io.KeyRepeatRate = 0.02f;                            // Faster key repeat rate
   ImGui::StyleColorsDark();
   ImGui_ImplSDL2_InitForOpenGL(m_window.get(), m_gl_context);
   ImGui_ImplOpenGL3_Init("#version 130");
@@ -113,10 +119,12 @@ void Ui::render()
   }
 
   // Calculate remaining height for the child window
-  float footer_height_to_reserve = ImGui::GetStyle().ItemSpacing.y; // Adjust as needed for other elements below
+  float footer_height_to_reserve =
+    ImGui::GetStyle().ItemSpacing.y; // Adjust as needed for other elements below
   ImVec2 child_size = ImVec2(0, -footer_height_to_reserve);
 
-  ImGui::BeginChild("SampleListChild", child_size, ImGuiChildFlags_None, ImGuiWindowFlags_AlwaysVerticalScrollbar);
+  ImGui::BeginChild(
+    "SampleListChild", child_size, ImGuiChildFlags_None, ImGuiWindowFlags_AlwaysVerticalScrollbar);
 
   if (ImGui::IsKeyPressed(ImGuiKey_UpArrow))
   {

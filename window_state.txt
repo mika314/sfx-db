@@ -2,3 +2,4 @@
 29
 1920
 1019
+filename like "%sfx%" and duration < 3

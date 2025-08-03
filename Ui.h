@@ -10,7 +10,11 @@
 class Ui
 {
 public:
-  Ui(sdl::Window &window, SDL_GLContext gl_context, Database &db, std::vector<Sample> &samples_data, const std::string& initial_filter);
+  Ui(sdl::Window &window,
+     SDL_GLContext gl_context,
+     Database &db,
+     std::vector<Sample> &samples_data,
+     const std::string &initial_filter);
   ~Ui();
 
   bool processEvent(SDL_Event &event);

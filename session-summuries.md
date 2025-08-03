@@ -149,3 +149,29 @@ This session focused on making the filter value persistent across sessions and e
     *   Modified the `Ui` constructor in `Ui.cpp` to call `m_db.load_samples` with the `initial_filter` to ensure the filter is applied when the application starts.
 *   **Verification:**
     *   Successfully built the project using `coddle debug` to ensure the changes were correct.
+---
+
+Sat Aug 2 04:42:28 PM PDT 2025
+
+This session focused on adding the functionality to copy the selected sample's path to the clipboard.
+
+**Summary of Actions:**
+
+*   **Copy to Clipboard:**
+    *   Modified `Ui.cpp` to call `ImGui::SetClipboardText()` with the `filepath` of the selected sample.
+    *   This is triggered whenever a sample is selected, either by mouse click or keyboard navigation.
+*   **Verification:**
+    *   Successfully built the project using `coddle debug` to ensure the changes were correct.
+---
+
+Sat Aug 2 04:47:15 PM PDT 2025
+
+This session focused on optimizing the sample list rendering for large libraries.
+
+**Summary of Actions:**
+
+*   **ImGuiListClipper Implementation:**
+    *   Modified the `render()` method in `Ui.cpp` to use `ImGuiListClipper`.
+    *   This ensures that only visible items in the sample list are rendered, significantly improving performance.
+*   **Verification:**
+    *   Successfully built the project using `coddle debug` to ensure the changes were correct.
