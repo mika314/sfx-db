@@ -22,7 +22,16 @@ int main(int /*argc*/, char ** /*argv*/)
     std::string initial_filter;
     int initial_selected_sample_idx = -1;
 
-    std::ifstream ifs("window_state.txt");
+    char* pref_path_c = SDL_GetPrefPath("sfx-db", "sfx-db");
+    std::string pref_path = "";
+    if (pref_path_c)
+    {
+        pref_path = pref_path_c;
+        SDL_free(pref_path_c);
+    }
+    std::string config_file_path = pref_path + "sfx_db_config.txt";
+    
+    std::ifstream ifs(config_file_path);
     if (ifs.is_open())
     {
       ifs >> initial_window_x;
@@ -69,7 +78,7 @@ int main(int /*argc*/, char ** /*argv*/)
     SDL_GetWindowPosition(window.get(), &final_window_x, &final_window_y);
     SDL_GetWindowSize(window.get(), &final_window_w, &final_window_h);
 
-    std::ofstream ofs("window_state.txt");
+    std::ofstream ofs(config_file_path);
     if (ofs.is_open())
     {
       ofs << final_window_x << std::endl;

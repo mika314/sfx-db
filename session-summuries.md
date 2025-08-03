@@ -189,3 +189,18 @@ This session focused on making the selected sample persistent across application
     *   Modified `Ui.cpp` to initialize `m_selected_sample_idx` from the loaded value and to set `m_scroll_to_selected` to `true` if a valid index is loaded.
 *   **Verification:**
     *   Successfully built the project using `coddle debug` to ensure the changes were correct.
+
+---
+
+Sat Aug 2 05:00:00 PM PDT 2025
+
+This session focused on moving the application's configuration file to a more appropriate location using SDL functionality.
+
+**Summary of Actions:**
+
+*   **Configuration File Relocation:**
+    *   Modified `main.cpp` to use `SDL_GetPrefPath` to determine a platform-specific directory for saving application preferences.
+    *   Renamed `window_state.txt` to `sfx_db_config.txt` and moved its handling to the SDL preferences path.
+    *   Removed the old `window_state.txt` file.
+*   **Verification:**
+    *   Successfully built the project using `coddle debug` to ensure the changes were correct.
