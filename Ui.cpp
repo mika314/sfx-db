@@ -29,7 +29,6 @@ Ui::Ui(sdl::Window &window,
   ImGui::CreateContext();
   ImGuiIO &io = ImGui::GetIO();
   (void)io;
-  io.ConfigFlags &= ~ImGuiConfigFlags_ViewportsEnable; // Disable multi-viewports
   io.KeyRepeatDelay = 0.15f;                           // Shorter delay before key repeat starts
   io.KeyRepeatRate = 0.02f;                            // Faster key repeat rate
   ImGui::StyleColorsDark();
@@ -82,7 +81,6 @@ void Ui::render()
   ImGuiViewport *viewport = ImGui::GetMainViewport();
   ImGui::SetNextWindowPos(viewport->WorkPos);
   ImGui::SetNextWindowSize(viewport->WorkSize);
-  ImGui::SetNextWindowViewport(viewport->ID);
 
   ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |
                                   ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse |
